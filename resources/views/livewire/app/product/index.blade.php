@@ -200,28 +200,79 @@
                     </div>
                 </div>
 
-                <!-- Nombre y Categoría -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="space-y-2">
-            <label class="font-label-caps text-label-caps text-primary uppercase">Nombre del Producto</label>
-            <input
-                class="w-full px-4 py-3 bg-surface @error('name') border-error ring-1 ring-error @else border-outline-variant @enderror rounded-xl focus:ring-2 focus:ring-secondary text-body-md border"
-                id="productName" placeholder="Nombre descriptivo" type="text" wire:model="name" />
-            @error('name') <p class="text-error text-xs font-semibold mt-1">{{ $message }}</p> @enderror
-        </div>
-        
-        <div class="space-y-2">
-            <label class="font-label-caps text-label-caps text-primary uppercase">Categoría</label>
-            <select wire:model="category_id"
-                class="w-full px-4 py-3 bg-surface @error('category_id') border-error ring-1 ring-error @else border-outline-variant @enderror border rounded-xl focus:ring-2 focus:ring-secondary text-body-md appearance-none">
-                <option value="">Seleccione una categoría</option>
-                @foreach ($categories as $category)
-                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                @endforeach
-            </select>
-            @error('category_id') <p class="text-error text-xs font-semibold mt-1">{{ $message }}</p> @enderror
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" 
+     x-data="{ 
+        open: false, 
+        search: @entangle('categorySearch').live, // Si tienes una propiedad en el backend para filtrar
+        selectedId: @entangle('category_id'),
+        selectedName: '',
+        init() {
+            // Sincronizar el nombre al editar o abrir el modal
+            let current = @js($categories).find(c => c.id === this.selectedId);
+            if(current) this.selectedName = current.name;
+            
+            $watch('selectedId', id => {
+                let cat = @js($categories).find(c => c.id === id);
+                this.selectedName = cat ? cat.name : '';
+            });
+        }
+     }">
+    
+    <!-- Nombre del Producto -->
+    <div class="space-y-2">
+        <label class="font-label-caps text-label-caps text-primary uppercase">Nombre del Producto</label>
+        <input
+            class="w-full px-4 py-3 bg-surface @error('name') border-error ring-1 ring-error @else border-outline-variant @enderror rounded-xl focus:ring-2 focus:ring-secondary text-body-md border"
+            id="productName" placeholder="Nombre descriptivo" type="text" wire:model="name" />
+        @error('name') <p class="text-error text-xs font-semibold mt-1">{{ $message }}</p> @enderror
     </div>
+    
+    <!-- Categoría con Autocomplete -->
+    <div class="space-y-2 relative" @click.away="open = false">
+        <label class="font-label-caps text-label-caps text-primary uppercase">Categoría</label>
+        
+        <div class="relative">
+            <input type="text" 
+                   class="w-full px-4 py-3 bg-surface @error('category_id') border-error ring-1 ring-error @else border-outline-variant @enderror border rounded-xl focus:ring-2 focus:ring-secondary text-body-md pr-10"
+                   placeholder="Escriba para buscar categoría..."
+                   x-model="selectedName"
+                   @focus="open = true; selectedId = ''"
+                   @input="open = true; search = selectedName" />
+            
+            <!-- Icono dinámico indicador -->
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline pointer-events-none text-sm" x-text="open ? 'expand_less' : 'search'"></span>
+        </div>
+
+        <!-- Lista desplegable filtrada en tiempo real -->
+        <div x-show="open" 
+             x-transition
+             class="absolute left-0 right-0 mt-1 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xl max-h-48 overflow-y-auto z-50 divide-y divide-outline-variant/30 custom-scrollbar"
+             style="display: none;">
+            
+            @php
+                // Filtrado rápido en el cliente o puedes mapear la variable reactiva del backend
+                $filteredCategories = $categories;
+            @endphp
+
+            <template x-for="category in @js($categories)" :key="category.id">
+                <button type="button"
+                        x-show="category.name.toLowerCase().includes(selectedName.toLowerCase())"
+                        @click="selectedId = category.id; selectedName = category.name; open = false; search = ''"
+                        class="w-full text-left px-4 py-2.5 hover:bg-surface-container text-body-sm transition-colors font-medium text-primary block">
+                    <span x-text="category.name"></span>
+                </button>
+            </template>
+            
+            <!-- Estado vacío por si no coincide la búsqueda -->
+            <div class="p-3 text-center text-xs text-outline italic" 
+                 x-show="!@js($categories).filter(c => c.name.toLowerCase().includes(selectedName.toLowerCase())).length">
+                No se encontraron categorías matching
+            </div>
+        </div>
+
+        @error('category_id') <p class="text-error text-xs font-semibold mt-1">{{ $message }}</p> @enderror
+    </div>
+</div>
                 <hr>
                 <!-- Fila Financiera: Precios en $ y Conversión Informativa en Bs. -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-surface-container-low p-5 rounded-2xl border border-outline-variant/60">
