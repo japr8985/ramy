@@ -19,5 +19,6 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/suppliers', \App\Livewire\App\Supplier\Index::class)->name('suppliers');
     Route::get('/accounts-receivable', \App\Livewire\App\AccountsReceivable\Index::class)->name('accounts-receivable');
     Route::get('/settings', \App\Livewire\App\Settings\Index::class)->name('settings');
+    Route::get('/categories', \App\Livewire\App\Category\Index::class)->name('categories');
     Route::get('/receivables', \App\Livewire\App\AccountsReceivable\Index::class)->name('receivables');
 });
