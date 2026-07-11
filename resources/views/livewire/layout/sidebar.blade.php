@@ -60,15 +60,6 @@
             </a>
         </nav>
 
-        <div class="p-6 border-t border-outline-variant flex items-center gap-3">
-            <img class="w-10 h-10 rounded-full object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuPTDCyLn9GjwQRXhnwarLhfNbAu7or-XxZBFHcASqzbwT_X4jhKbWL1WiQlWexPl5fmHWG_uKKlSsAEiRWYbaiVDHCYWBQb5e8o7aF7qDFljWlWxT4x0SSa9_I_YlAOvDJjVo9BIt1mtkYHtYLbxY7Q4qKBNCJydtB9Bw8xA6gK84v_CI4Cq9J-9px5HiZUB6Vn_Ebj-9R712qN7JOmfFjUYPiAeHO3vrK2kc6xyx6H9iazkQGchJ0Q"
-                alt="User Avatar" />
-            <div>
-                <p class="font-label-caps text-label-caps font-bold">Admin User</p>
-                <p class="text-[10px] uppercase text-on-surface-variant">Systems Overseer</p>
-            </div>
-        </div>
     </aside>
 
     <!-- CONTROLADOR ALPINE PARA BARRA MÓVIL Y MENÚ FLOTANTE EXTENDIDO -->
