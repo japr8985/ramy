@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Livewire\App\AccountsReceivable;
 
 use Livewire\Component;
@@ -14,24 +13,22 @@ class Index extends Component
 
     public $search = '';
     public bool $modal = false;
-    public bool $historyModal = false; // Control de la vista del historial
+    public bool $historyModal = false; 
     public $exchangeRate = 1.0;
 
     // Propiedades para procesar el abono
     public $selectedInvoiceId;
     public $customer_name;
-    public $current_invoice_balance = 0; // Guardado en $
+    public $current_invoice_balance = 0; 
     
-    // Formulario de Abono Reactivo
+    // Formulario de Abono Reactivo vinculados a la vista
     public $payment_date;
-    public $input_currency = 'USD'; // Conmutador: USD o VES
-    public $amount_usd = '';        // Lo que se descuenta contablemente de la deuda
-    public $amount_ves = '';        // Lo que se digita si el cliente paga en Bs.
+    public $input_currency = 'USD'; 
+    public $amount_usd = 0;        
+    public $amount_ves = 0;        
     public $payment_method = 'Bank Transfer';
     public $notes = '';
 
-
-    // Colección para la subvista del historial
     public array $paymentHistory = [];
 
     public function updatingSearch() { $this->resetPage(); }
@@ -48,45 +45,12 @@ class Index extends Component
         $this->exchangeRate = Product::getExchangeRate();
         $this->input_currency = 'USD';
         
-        // Inicializar los montos con el pago total sugerido
+        // Inicializar los montos sugeridos directamente aquí al abrir el modal
         $this->amount_usd = $this->current_invoice_balance;
         $this->amount_ves = round($this->amount_usd * $this->exchangeRate, 2);
         
         $this->payment_date = now()->format('Y-m-d');
         $this->modal = true;
-    }
-
-    // Escucha en tiempo real si el operador escribe en el campo de Dólares ($)
-    public function updatedAmountUsd()
-    {
-        $this->amount_usd = is_numeric($this->amount_usd) ? (float)$this->amount_usd : 0;
-        
-        // Bloquear topes lógicos
-        if ($this->amount_usd < 0) $this->amount_usd = 0;
-        if ($this->amount_usd > $this->current_invoice_balance) $this->amount_usd = $this->current_invoice_balance;
-
-        // Calcular contraparte en Bs.
-        $this->amount_ves = round($this->amount_usd * $this->exchangeRate, 2);
-    }
-
-    // Escucha en tiempo real si el operador escribe en el campo de Bolívares (Bs.)
-    public function updatedAmountVes()
-    {
-        $this->amount_ves = is_numeric($this->amount_ves) ? (float)$this->amount_ves : 0;
-        $maxVes = $this->current_invoice_balance * $this->exchangeRate;
-
-        // Bloquear topes lógicos
-        if ($this->amount_ves < 0) $this->amount_ves = 0;
-        if ($this->amount_ves > $maxVes) $this->amount_ves = $maxVes;
-
-        // Calcular conversión inversa hacia Dólares ($) de forma exacta
-        $this->amount_usd = $this->exchangeRate > 0 ? round($this->amount_ves / $this->exchangeRate, 4) : 0;
-    }
-
-    // Si el operador cambia el botón de moneda, resincronizamos
-    public function setCurrency($currency)
-    {
-        $this->input_currency = $currency;
     }
 
     public function closePaymentModal()
@@ -95,7 +59,6 @@ class Index extends Component
         $this->reset(['selectedInvoiceId', 'customer_name', 'current_invoice_balance', 'amount_usd', 'amount_ves', 'notes']);
     }
 
-    // NUEVO: Cargar cronología histórica de pagos recibidos
     public function openHistoryModal($id)
     {
         $invoice = AccountsReceivable::with(['customer', 'payments'])->findOrFail($id);
@@ -112,6 +75,9 @@ class Index extends Component
 
     public function postPayment()
     {
+        // Convertimos el valor entrante a flotante para validación segura
+        $this->amount_usd = (float) $this->amount_usd;
+
         $this->validate([
             'amount_usd' => 'required|numeric|min:0.01|max:' . $this->current_invoice_balance,
             'payment_date' => 'required|date',
@@ -126,7 +92,6 @@ class Index extends Component
             $invoice = AccountsReceivable::findOrFail($this->selectedInvoiceId);
             $currentRate = Product::getExchangeRate();
 
-            // Guardar el abono mapeando la conversión limpia en dólares ($)
             ReceivablePayment::create([
                 'accounts_receivable_id' => $invoice->id,
                 'payment_date' => $this->payment_date,

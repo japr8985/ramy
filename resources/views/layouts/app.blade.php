@@ -221,78 +221,87 @@
         <x-layout.sidebar />
         <main class="flex-1 flex flex-col min-w-0">
             <!-- TopNavBar -->
-            <header class="sticky top-0 z-40 flex items-center justify-between w-full h-16 px-gutter bg-surface-container-lowest dark:bg-surface-container-low border-b border-outline-variant shadow-sm">
-    <!-- Buscador Global -->
-    <div class="flex items-center gap-4 flex-1">
-        <div class="relative w-full max-w-md"> 
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
-            <input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-lg focus:ring-2 focus:ring-secondary text-body-sm"
-                placeholder="Search stock, barcodes, or categories..." type="text" />
-        </div>
-    </div>
-    
-    <!-- Botones de Acción y Perfil -->
-    <div class="flex items-center gap-2 md:gap-4">
-        <button class="p-2 hover:bg-surface-container-high rounded-full transition-all text-on-surface-variant">
-            <span class="material-symbols-outlined">barcode_scanner</span>
-        </button>
-        
-        <button class="p-2 hover:bg-surface-container-high rounded-full transition-all text-on-surface-variant relative">
-            <span class="material-symbols-outlined">notifications</span>
-            <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
-        </button>
-        
-        <div class="h-6 w-[1px] bg-outline-variant mx-1 hidden md:block"></div>
-        
-        <!-- DROPDOWN DE PERFIL (AlpineJS) -->
-        <div class="relative" x-data="{ open: false }" @click.away="open = false">
-            <button @click="open = !open" type="button" class="flex items-center gap-2 p-1.5 hover:bg-surface-container-high rounded-xl transition-all focus:ring-2 focus:ring-outline-variant">
-                <img class="w-8 h-8 rounded-full object-cover shadow-xs border border-outline-variant"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuPTDCyLn9GjwQRXhnwarLhfNbAu7or-XxZBFHcASqzbwT_X4jhKbWL1WiQlWexPl5fmHWG_uKKlSsAEiRWYbaiVDHCYWBQb5e8o7aF7qDFljWlWxT4x0SSa9_I_YlAOvDJjVo9BIt1mtkYHtYLbxY7Q4qKBNCJydtB9Bw8xA6gK84v_CI4Cq9J-9px5HiZUB6Vn_Ebj-9R712qN7JOmfFjUYPiAeHO3vrK2kc6xyx6H9iazkQGchJ0Q"
-                    alt="User Avatar" />
-                <span class="material-symbols-outlined text-outline text-sm hidden md:block" x-text="open ? 'expand_less' : 'expand_more'"></span>
-            </button>
-
-            <!-- Menú Desplegable Flotante -->
-            <div x-show="open" 
-                 x-transition:enter="transition ease-out duration-100 transform"
-                 x-transition:enter-start="opacity-0 scale-95"
-                 x-transition:enter-end="opacity-100 scale-100"
-                 x-transition:leave="transition ease-in duration-75 transform"
-                 x-transition:leave-start="opacity-100 scale-100"
-                 x-transition:leave-end="opacity-0 scale-95"
-                 class="absolute right-0 mt-2 w-52 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xl py-2 z-50 divide-y divide-outline-variant/40"
-                 style="display: none;">
-                
-                <!-- Datos del Usuario Logueado (Informativo) -->
-                <div class="px-4 py-2.5">
-                    <p class="text-xs font-bold text-primary truncate">{{ auth()->user()->name ?? 'Admin User' }}</p>
-                    <p class="text-[10px] text-outline uppercase font-semibold tracking-wide truncate">{{ auth()->user()->email ?? 'admin@nexus.com' }}</p>
+            <header
+                class="sticky top-0 z-40 flex items-center justify-between w-full h-16 px-gutter bg-surface-container-lowest dark:bg-surface-container-low border-b border-outline-variant shadow-sm">
+                <!-- Buscador Global -->
+                <div class="flex items-center gap-4 flex-1">
+                    <div class="relative w-full max-w-md">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+                        <input
+                            class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-lg focus:ring-2 focus:ring-secondary text-body-sm"
+                            placeholder="Search stock, barcodes, or categories..." type="text" />
+                    </div>
                 </div>
 
-                <!-- Opciones del Menú -->
-                <div class="py-1">
-                    <a href="{{ route('settings') }}" class="flex items-center gap-3 px-4 py-2 text-body-sm text-primary hover:bg-surface-container transition-colors font-medium">
-                        <span class="material-symbols-outlined text-md">settings</span>
-                        Configuración
-                    </a>
-                </div>
+                <!-- Botones de Acción y Perfil -->
+                <div class="flex items-center gap-2 md:gap-4">
+                    <button
+                        class="p-2 hover:bg-surface-container-high rounded-full transition-all text-on-surface-variant">
+                        <span class="material-symbols-outlined">barcode_scanner</span>
+                    </button>
 
-                <!-- Botón de Cierre de Sesión -->
-                <div class="py-1">
-                    <form method="POST" action="{{ route('logout') }}" id="logout-form">
-                        @csrf
-                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-body-sm text-error hover:bg-error-container/20 transition-colors font-semibold text-left">
-                            <span class="material-symbols-outlined text-md">logout</span>
-                            Cerrar Sesión
+                    <button
+                        class="p-2 hover:bg-surface-container-high rounded-full transition-all text-on-surface-variant relative">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+                    </button>
+
+                    <div class="h-6 w-[1px] bg-outline-variant mx-1 hidden md:block"></div>
+
+                    <!-- DROPDOWN DE PERFIL (AlpineJS) -->
+                    <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                        <button @click="open = !open" type="button"
+                            class="flex items-center gap-2 p-1.5 hover:bg-surface-container-high rounded-xl transition-all focus:ring-2 focus:ring-outline-variant">
+                            <img class="w-8 h-8 rounded-full object-cover shadow-xs border border-outline-variant"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuPTDCyLn9GjwQRXhnwarLhfNbAu7or-XxZBFHcASqzbwT_X4jhKbWL1WiQlWexPl5fmHWG_uKKlSsAEiRWYbaiVDHCYWBQb5e8o7aF7qDFljWlWxT4x0SSa9_I_YlAOvDJjVo9BIt1mtkYHtYLbxY7Q4qKBNCJydtB9Bw8xA6gK84v_CI4Cq9J-9px5HiZUB6Vn_Ebj-9R712qN7JOmfFjUYPiAeHO3vrK2kc6xyx6H9iazkQGchJ0Q"
+                                alt="User Avatar" />
+                            <span class="material-symbols-outlined text-outline text-sm hidden md:block"
+                                x-text="open ? 'expand_less' : 'expand_more'"></span>
                         </button>
-                    </form>
+
+                        <!-- Menú Desplegable Flotante -->
+                        <div x-show="open" x-transition:enter="transition ease-out duration-100 transform"
+                            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75 transform"
+                            x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                            class="absolute right-0 mt-2 w-52 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xl py-2 z-50 divide-y divide-outline-variant/40"
+                            style="display: none;">
+
+                            <!-- Datos del Usuario Logueado (Informativo) -->
+                            <div class="px-4 py-2.5">
+                                <p class="text-xs font-bold text-primary truncate">
+                                    {{ auth()->user()->name ?? 'Admin User' }}
+                                </p>
+                                <p class="text-[10px] text-outline uppercase font-semibold tracking-wide truncate">{{
+                                    auth()->user()->email ?? 'admin@nexus.com' }}</p>
+                            </div>
+
+                            <!-- Opciones del Menú -->
+                            <div class="py-1">
+                                <a href="{{ route('settings') }}"
+                                    class="flex items-center gap-3 px-4 py-2 text-body-sm text-primary hover:bg-surface-container transition-colors font-medium">
+                                    <span class="material-symbols-outlined text-md">settings</span>
+                                    Configuración
+                                </a>
+                            </div>
+
+                            <!-- Botón de Cierre de Sesión -->
+                            <div class="py-1">
+                                <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                                    @csrf
+                                    <button type="submit"
+                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-body-sm text-error hover:bg-error-container/20 transition-colors font-semibold text-left">
+                                        <span class="material-symbols-outlined text-md">logout</span>
+                                        Cerrar Sesión
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-            </div>
-        </div>
-        
-    </div>
-</header>
+            </header>
             <!-- Main Content Area -->
             <div class="p-gutter overflow-y-auto">
                 {{ $slot }}

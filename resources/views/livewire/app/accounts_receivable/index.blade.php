@@ -1,5 +1,5 @@
 <div class="p-margin-mobile md:p-gutter space-y-6">
-    
+
     <!-- Encabezado de Sección -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -8,7 +8,9 @@
         </div>
         <div class="relative w-full md:max-w-xs">
             <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-sm">search</span>
-            <input type="text" wire:model.live.debounce.300ms="search" class="w-full pl-9 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm focus:ring-2 focus:ring-secondary" placeholder="Buscar por cliente o factura..." />
+            <input type="text" wire:model.live.debounce.300ms="search"
+                class="w-full pl-9 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm focus:ring-2 focus:ring-secondary"
+                placeholder="Buscar por cliente o factura..." />
         </div>
     </div>
 
@@ -36,7 +38,7 @@
         <div class="p-4 border-b border-outline-variant bg-surface-container-low/50">
             <h4 class="font-bold text-on-surface text-sm uppercase">Registro de Créditos Activos</h4>
         </div>
-        
+
         <div class="overflow-x-auto">
             <table class="w-full min-w-[900px] text-left border-collapse">
                 <thead>
@@ -81,10 +83,17 @@
                                     </span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-center">
-                                <button wire:click="openPaymentModal('{{ $invoice->id }}')" class="text-secondary hover:text-primary font-bold text-xs inline-flex items-center gap-1 hover:underline">
-                                    Abonar <span class="material-symbols-outlined text-sm">add_circle</span>
-                                </button>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-center gap-3">
+                                    <button wire:click="openPaymentModal('{{ $invoice->id }}')"
+                                        class="text-secondary hover:text-primary font-bold text-xs inline-flex items-center gap-1 hover:underline">
+                                        Abonar <span class="material-symbols-outlined text-sm">add_circle</span>
+                                    </button>
+                                    <button wire:click="openHistoryModal('{{ $invoice->id }}')" 
+                                        class="text-outline hover:text-primary font-medium text-xs inline-flex items-center gap-0.5 hover:underline" title="Ver historial de pagos">
+                                        Historial <span class="material-symbols-outlined text-sm">history</span>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -100,19 +109,60 @@
         </div>
     </div>
 
-    <!-- Modal de Registro de Abonos (Bottom Sheet Adaptado) -->
+    <!-- Modal de Registro de Abonos -->
     <div class="{{ $modal ? '' : 'hidden' }} fixed inset-0 z-50 flex items-end md:items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-xs" wire:click="closePaymentModal"></div>
-        
+
         <div class="relative bg-surface-container-lowest w-full max-w-md rounded-t-2xl md:rounded-2xl shadow-2xl overflow-hidden border border-outline-variant flex flex-col transform animate-in slide-in-from-bottom duration-200 z-10">
             <div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
                 <h3 class="text-headline-lg font-bold text-primary">Registrar Abono</h3>
-                <button class="text-on-surface-variant hover:text-error transition-colors" wire:click="closePaymentModal">
+                <button class="text-on-surface-variant hover:text-error transition-colors" type="button" wire:click="closePaymentModal">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-            
-            <form wire:submit.prevent="postPayment" class="p-6 space-y-4">
+
+            <!-- FORMULARIO ELECTRÓNICO REDISEÑADO CON ALPINEJS -->
+            <form wire:submit.prevent="postPayment" class="p-6 space-y-4"
+    x-data="{
+        rate: @js($exchangeRate),
+        maxUsd: @entangle('current_invoice_balance'), // Enlazado de forma reactiva en tiempo real
+        currency: @entangle('input_currency').live,
+        usd: @entangle('amount_usd'),
+        ves: @entangle('amount_ves'),
+        
+        init() {
+            // Cada vez que Livewire asigne una nueva factura al modal, Alpine actualiza los topes
+            $watch('maxUsd', value => {
+                let parsedMax = parseFloat(value) || 0;
+                if (parsedMax > 0) {
+                    this.usd = parsedMax;
+                    this.ves = (parsedMax * this.rate).toFixed(2);
+                }
+            });
+
+            // Escuchar cambios en el switch de moneda
+            $watch('currency', value => {
+                this.usd = 0;
+                this.ves = (0).toFixed(2);
+            });
+        },
+        calculateFromUsd() {
+            let parsed = parseFloat(this.usd) || 0;
+            let currentMax = parseFloat(this.maxUsd) || 0;
+            if (parsed > currentMax) { parsed = currentMax; this.usd = currentMax; }
+            if (parsed < 0) { parsed = 0; this.usd = 0; }
+            this.ves = (parsed * this.rate).toFixed(2);
+        },
+        calculateFromVes() {
+            let parsed = parseFloat(this.ves) || 0;
+            let currentMax = parseFloat(this.maxUsd) || 0;
+            let maxVes = currentMax * this.rate;
+            if (parsed > maxVes) { parsed = maxVes; this.ves = maxVes.toFixed(2); }
+            if (parsed < 0) { parsed = 0; this.ves = (0).toFixed(2); }
+            this.usd = this.rate > 0 ? parseFloat((parsed / this.rate).toFixed(4)) : 0;
+        }
+    }">
+                
                 <div>
                     <p class="text-[10px] font-bold text-outline uppercase tracking-wider mb-0.5">Cliente</p>
                     <p class="text-headline-lg font-bold text-secondary">{{ $customer_name }}</p>
@@ -123,8 +173,8 @@
                         <label class="block text-[11px] font-bold text-outline uppercase mb-1">Deuda Pendiente</label>
                         <div class="text-xs font-bold font-data-mono bg-surface-container p-2 rounded border border-outline-variant text-primary">
                             ${{ number_format($current_invoice_balance, 2) }}<br>
-                            <span class="text-[10px] font-normal text-secondary">Bs. {{ number_format($current_invoice_balance * $exchangeRate, 2, ',', '.') }}</span>
                         </div>
+                        <span class="text-[10px] font-normal text-secondary">Bs. {{ number_format($current_invoice_balance * $exchangeRate, 2, ',', '.') }}</span>
                     </div>
                     <div>
                         <label class="block text-[11px] font-bold text-outline uppercase mb-1">Fecha de Recepción</label>
@@ -136,33 +186,51 @@
                 <div class="space-y-2">
                     <label class="block text-[11px] font-bold text-outline uppercase">Moneda de Recepción en Caja</label>
                     <div class="grid grid-cols-2 bg-surface border border-outline-variant p-1 rounded-xl">
-                        <button type="button" wire:click="setCurrency('USD')" class="py-1.5 rounded-lg text-xs font-bold transition-all {{ $input_currency === 'USD' ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant hover:text-primary' }}">
+                        <button type="button" @click="currency = 'USD'" :class="currency === 'USD' ? 'bg-primary text-on-primary shadow-xs' : 'text-on-surface-variant hover:text-primary'" class="py-1.5 rounded-lg text-xs font-bold transition-all">
                             DÓLARES ($)
                         </button>
-                        <button type="button" wire:click="setCurrency('VES')" class="py-1.5 rounded-lg text-xs font-bold transition-all {{ $input_currency === 'VES' ? 'bg-secondary text-on-secondary shadow-xs' : 'text-on-surface-variant hover:text-primary' }}">
+                        <button type="button" @click="currency = 'VES'" :class="currency === 'VES' ? 'bg-secondary text-on-secondary shadow-xs' : 'text-on-surface-variant hover:text-primary'" class="py-1.5 rounded-lg text-xs font-bold transition-all">
                             BOLÍVARES (Bs.)
                         </button>
                     </div>
                 </div>
 
-                <!-- CAMPO DINÁMICO SEGÚN EL SWITCH -->
-                <div>
-                    <label class="block text-[11px] font-bold text-outline uppercase mb-1">Monto Entregado *</label>
-                    @if($input_currency === 'USD')
+                <!-- INPUTS EN PARALELO CONTROLADOS POR ESTADOS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Input en Dólares -->
+                    <div class="space-y-1">
+                        <label class="block text-[11px] font-bold text-outline uppercase">Monto en Dólares ($)</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-on-surface-variant font-bold">$</span>
-                            <input type="number" step="0.0001" wire:model.live="amount_usd" class="w-full pl-8 pr-4 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-headline-lg font-bold focus:ring-2 focus:ring-primary" placeholder="0.00" />
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-on-surface-variant font-bold text-xs" :class="currency !== 'USD' && 'opacity-40'">$</span>
+                            <input type="number" step="0.0001" x-model="usd" @input="calculateFromUsd()"
+                                :readonly="currency !== 'USD'"
+                                :disabled="currency !== 'USD'"
+                                :class="currency !== 'USD' ? 'bg-surface-container opacity-60 text-outline-variant cursor-not-allowed select-none' : 'bg-surface-container-lowest focus:ring-2 focus:ring-primary font-bold text-primary'"
+                                class="w-full pl-7 pr-3 py-2.5 border border-outline-variant rounded-lg text-body-md font-data-mono" />
                         </div>
-                        <p class="text-[11px] font-semibold text-outline-variant mt-1 px-1">Equivalente informativo: Bs. {{ number_format((float)($amount_ves ?: 0), 2, ',', '.') }}</p>
-                    @else
+                    </div>
+
+                    <!-- Input en Bolívares -->
+                    <div class="space-y-1">
+                        <label class="block text-[11px] font-bold text-outline uppercase">Monto en Bolívares (Bs.)</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-on-surface-variant font-bold text-xs">Bs.</span>
-                            <input type="number" step="0.01" wire:model.live="amount_ves" class="w-full pl-10 pr-4 py-2.5 bg-surface-container-lowest border border-outline-variant rounded-lg text-headline-lg font-bold focus:ring-2 focus:ring-secondary" placeholder="0.00" />
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-on-surface-variant font-bold text-xs" :class="currency !== 'VES' && 'opacity-40'">Bs.</span>
+                            <input type="number" step="0.01" x-model="ves" @input="calculateFromVes()"
+                                :readonly="currency !== 'VES'"
+                                :disabled="currency !== 'VES'"
+                                :class="currency !== 'VES' ? 'bg-surface-container opacity-60 text-outline-variant cursor-not-allowed select-none' : 'bg-surface-container-lowest focus:ring-2 focus:ring-secondary font-bold text-secondary'"
+                                class="w-full pl-10 pr-3 py-2.5 border border-outline-variant rounded-lg text-body-md font-data-mono" />
                         </div>
-                        <p class="text-[11px] font-semibold text-primary mt-1 px-1">Amortización contable: ${{ number_format((float)($amount_usd ?: 0), 2) }} <span class="text-[10px] text-outline font-normal">(Tasa: {{ $exchangeRate }})</span></p>
-                    @endif
-                    @error('amount_usd') <p class="text-error text-xs font-semibold mt-1">{{ $message }}</p> @enderror
+                    </div>
                 </div>
+
+                <!-- Mensaje Informativo de Tasas de Cambio -->
+                <div class="p-3 bg-surface border border-outline-variant/60 rounded-xl flex items-center justify-between text-[11px] text-on-surface-variant font-medium">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs text-outline">info</span> Tasa BCV Oficial</span>
+                    <span class="font-data-mono font-bold text-primary">Bs. {{ number_format($exchangeRate, 2, ',', '.') }}</span>
+                </div>
+                
+                @error('amount_usd') <p class="text-error text-xs font-semibold mt-1">{{ $message }}</p> @enderror
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-1">
@@ -186,10 +254,11 @@
             </form>
         </div>
     </div>
-    <!-- NUEVO: Modal de Historial de Pagos Cronológico de la Cuenta -->
+
+    <!-- Modal de Historial de Pagos Cronológico de la Cuenta -->
     <div class="{{ $historyModal ? '' : 'hidden' }} fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-xs" wire:click="closeHistoryModal"></div>
-        
+
         <div class="relative bg-surface-container-lowest w-full max-w-lg rounded-2xl border border-outline-variant shadow-2xl flex flex-col transform animate-in zoom-in duration-150 z-10 max-h-[85vh]">
             <div class="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
                 <div>
@@ -198,7 +267,7 @@
                 </div>
                 <button type="button" wire:click="closeHistoryModal" class="p-1 hover:bg-surface-container-high rounded-full"><span class="material-symbols-outlined">close</span></button>
             </div>
-            
+
             <div class="p-6 overflow-y-auto space-y-3 flex-1 custom-scrollbar">
                 @forelse($paymentHistory as $pay)
                     <div class="border border-outline-variant/60 rounded-xl p-3 bg-surface flex items-center justify-between gap-4">
