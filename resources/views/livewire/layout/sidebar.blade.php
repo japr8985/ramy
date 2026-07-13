@@ -29,6 +29,10 @@
                 <span class="material-symbols-outlined">point_of_sale</span>
                 <span class="font-label-caps text-label-caps">Sales (POS)</span>
             </a>
+            <a href="{{ route('sales.history') }}" class="flex items-center gap-3 px-4 py-3 transition-colors {{ request()->routeIs('sales.history') ? 'border-l-4 border-secondary bg-secondary-fixed/30 text-secondary dark:text-secondary-fixed font-semibold' : 'text-on-surface-variant dark:text-outline hover:bg-surface-container-high' }}">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="font-label-caps text-label-caps">Historial Ventas</span>
+            </a>
 
             <a href="{{ route('customers') }}"
                 class="flex items-center gap-3 px-4 py-3 transition-colors {{ request()->routeIs('customers*') ? 'border-l-4 border-secondary bg-secondary-fixed/30 text-secondary dark:text-secondary-fixed font-semibold' : 'text-on-surface-variant dark:text-outline hover:bg-surface-container-high' }}">

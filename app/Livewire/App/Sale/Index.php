@@ -35,6 +35,7 @@ class Index extends Component
     public $quick_rif_ci = '';
     public $quick_name = '';
     public $quick_phone = '';
+    public bool $showCart = false;
 
     // NUEVO: Modal Intermedio de Confirmación de Crédito e Inicial ($)
     public bool $creditConfirmModal = false;
@@ -157,6 +158,7 @@ class Index extends Component
         }
 
         $this->calculateTotals();
+        // $this->showCart = true;
     }
 
     public function updateQuantity(string $productId, $amount)

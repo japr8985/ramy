@@ -23,6 +23,7 @@ class Index extends Component
     
     // Formulario de Abono Reactivo vinculados a la vista
     public $payment_date;
+    
     public $input_currency = 'USD'; 
     public $amount_usd = 0;        
     public $amount_ves = 0;        

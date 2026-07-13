@@ -15,6 +15,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/products', App\Livewire\App\Product\Index::class)->name('products');
     Route::get('/products/{product}/edit', \App\Livewire\App\Product\Edit::class)->name('products.edit');
     Route::get('/sales', \App\Livewire\App\Sale\Index::class)->name('sales');
+    Route::get('/sales/history', \App\Livewire\App\Sale\History::class)->name('sales.history');
     Route::get('/customers', \App\Livewire\App\Customer\Index::class)->name('customers');
     Route::get('/suppliers', \App\Livewire\App\Supplier\Index::class)->name('suppliers');
     Route::get('/accounts-receivable', \App\Livewire\App\AccountsReceivable\Index::class)->name('accounts-receivable');

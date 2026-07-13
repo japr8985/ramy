@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable('category_id', 'unit_id', 'sku', 'name', 'purchase_price', 'selling_price', 'quantity', 'min_stock', 'is_active', 'description', 'notes')]
 class Product extends Model
@@ -52,5 +53,13 @@ class Product extends Model
     public function suppliers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(\App\Models\Supplier::class, 'product_supplier');
+    }
+
+    /**
+     * Un producto puede estar presente en muchos renglones de ventas históricas
+     */
+    public function saleItems(): HasMany
+    {
+        return $this->hasMany(SaleItem::class, 'product_id');
     }
 }
