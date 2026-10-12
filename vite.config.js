@@ -18,6 +18,9 @@ export default defineConfig({
             outDir: 'public',
             buildBase: '/',
             scope: '/',
+            devOptions: {
+                enable: true
+            },
             manifest: {
                 name: 'Mi Aplicación Laravel',
                 short_name: 'MiApp',

@@ -40,10 +40,10 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Unidad',
         //     'symbol' => 'U.'
         // ]);
-        // Setting::factory()->create([
-        //     'key' => 'bcv_rate',
-        //     'value' => 709,6935
-        // ]);
-        Product::factory(100)->create();
+        // // Setting::factory()->create([
+        // //     'key' => 'bcv_rate',
+        // //     'value' => 709,6935
+        // // ]);
+        // // Product::factory(100)->create();
     }
 }

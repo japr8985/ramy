@@ -23,3 +23,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/categories', \App\Livewire\App\Category\Index::class)->name('categories');
     Route::get('/receivables', \App\Livewire\App\AccountsReceivable\Index::class)->name('receivables');
 });
+
+Route::get('/vue/{any?}', function ($any = null) {
+    // dd('Llegó a la ruta de Vue:', $any);
+    return view('app');
+})->where('any', '.*');
