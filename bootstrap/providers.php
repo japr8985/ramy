@@ -7,4 +7,5 @@ return [
     App\Modules\Settings\Infrastructure\Provider\SettingsServiceProvider::class,
     App\Modules\Catalog\Infrastructure\Provider\CatalogServiceProvider::class,
     App\Modules\Parties\Infrastructure\Provider\PartiesServiceProvider::class,
+    App\Modules\Sales\Infrastructure\Provider\SalesServiceProvider::class,
 ];
