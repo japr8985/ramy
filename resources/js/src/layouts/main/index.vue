@@ -90,6 +90,9 @@ const authStore = useAuthStore();
 const drawer = ref(true);
 
 const navItems = [
+  { title: 'Productos', icon: 'mdi-check', to: '/products'},
+  { title: 'Clientes', icon: 'mdi-check', to: '/customers'},
+  { title: 'Categorias', icon: 'mdi-cog-outline', to: '/categories' },
   { title: 'Configuración', icon: 'mdi-cog-outline', to: '/settings' },
 ];
 
