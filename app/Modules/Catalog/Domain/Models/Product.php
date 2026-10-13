@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Catalog\Domain\Models;
 
+use App\Modules\Sales\Domain\Models\SaleItem;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -61,7 +62,7 @@ class Product extends Model
      */
     public function saleItems(): HasMany
     {
-        return $this->hasMany(\App\Models\SaleItem::class, 'product_id');
+        return $this->hasMany(SaleItem::class, 'product_id');
     }
 
     /**

@@ -216,9 +216,8 @@ async function loadSettings() {
     originalSettings = { ...data };
     Object.assign(form, data);
   } catch (error: any) {
-    notificationStore.show(
-      error?.response?.data?.message || 'Error al obtener las configuraciones del sistema.',
-      'error'
+    notificationStore.error(
+      error?.response?.data?.message || 'Error al obtener las configuraciones del sistema.'
     );
   } finally {
     isLoading.value = false;
@@ -233,7 +232,7 @@ async function saveSettings() {
 
   const { valid } = await formRef.value.validate();
   if (!valid) {
-    notificationStore.show('Por favor verifique los campos requeridos.', 'warning');
+    notificationStore.warning('Por favor verifique los campos requeridos.');
     return;
   }
 
@@ -243,11 +242,10 @@ async function saveSettings() {
     originalSettings = { ...updatedData };
     Object.assign(form, updatedData);
 
-    notificationStore.show('Configuraciones guardadas y tasa actualizada correctamente.', 'success');
+    notificationStore.success('Configuraciones guardadas y tasa actualizada correctamente.');
   } catch (error: any) {
-    notificationStore.show(
+    notificationStore.error(
       error?.response?.data?.message || 'Error al actualizar las configuraciones.',
-      'error'
     );
   } finally {
     isSaving.value = false;
@@ -259,7 +257,7 @@ async function saveSettings() {
  */
 function discardChanges() {
   Object.assign(form, originalSettings);
-  notificationStore.show('Cambios descartados.', 'info');
+  notificationStore.info('Cambios descartados.');
 }
 
 onMounted(() => {

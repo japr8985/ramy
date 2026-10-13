@@ -192,7 +192,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import partiesService from '@/services/partiesService';
+import partiesService from '@/api/parties.api';
 import { useNotificationStore } from '@/stores/notification';
 import type { CreateCustomerPayload, CustomerType } from '@/types/parties';
 
@@ -239,7 +239,7 @@ async function loadCustomer(id: string) {
     form.notes = customer.notes || '';
     salesCount.value = customer.sales_count ?? null;
   } catch (error: any) {
-    notificationStore.show('Cliente no encontrado.', 'error');
+    notificationStore.error('Cliente no encontrado.');
     router.push({ name: 'customers.index' });
   } finally {
     isLoading.value = false;
@@ -251,7 +251,7 @@ async function submit() {
 
   const { valid } = await formRef.value.validate();
   if (!valid) {
-    notificationStore.show('Por favor verifique los campos con error.', 'warning');
+    notificationStore.warning('Por favor verifique los campos con error.');
     return;
   }
 
@@ -269,17 +269,16 @@ async function submit() {
 
     if (isEditing.value && customerId.value) {
       await partiesService.updateCustomer(customerId.value, payload);
-      notificationStore.show('Cliente actualizado correctamente.', 'success');
+      notificationStore.success('Cliente actualizado correctamente.');
     } else {
       await partiesService.createCustomer(payload);
-      notificationStore.show('Cliente registrado con éxito.', 'success');
+      notificationStore.success('Cliente registrado con éxito.');
     }
 
     router.push({ name: 'customers.index' });
   } catch (error: any) {
-    notificationStore.show(
-      error?.response?.data?.message || 'Error al guardar el cliente.',
-      'error'
+    notificationStore.error(
+      error?.response?.data?.message || 'Error al guardar el cliente.'
     );
   } finally {
     isSaving.value = false;

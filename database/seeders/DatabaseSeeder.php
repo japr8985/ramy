@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
-use App\Models\Customer;
-use App\Models\Product;
-use App\Models\Setting;
-use App\Models\Unit;
+use App\Modules\Catalog\Domain\Models\Category;
+use App\Modules\Catalog\Domain\Models\Product;
+use App\Modules\Catalog\Domain\Models\Unit;
+use App\Modules\Parties\Domain\Models\Customer;
+use App\Modules\Settings\Domain\Models\Setting;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;

@@ -13,6 +13,7 @@ final readonly class ProcessSaleDTO
         public array $items,
         public ?string $customerId = null,
         public ?string $userId = null,
+        public ?string $cashShiftId = null,
         public string $paymentMethod = 'cash',
         public float $totalDiscount = 0.0,
         public float $exchangeRate = 1.0,
@@ -37,6 +38,9 @@ final readonly class ProcessSaleDTO
                 ? trim((string) $data['customer_id'])
                 : null,
             userId: isset($data['created_by']) ? (string) $data['created_by'] : null,
+            cashShiftId: isset($data['cash_shift_id']) && trim((string) $data['cash_shift_id']) !== ''
+                ? trim((string) $data['cash_shift_id'])
+                : null,
             paymentMethod: (string) ($data['payment_method'] ?? 'cash'),
             totalDiscount: (float) ($data['total_discount'] ?? 0.0),
             exchangeRate: (float) ($data['exchange_rate'] ?? 1.0),

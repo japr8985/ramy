@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 
-const metaGuest ={
+const metaGuest = {
   auth: false,
   layout: 'guest'
 }
-const meta ={
+const meta = {
   auth: true,
   layout: 'main'
 }
@@ -31,17 +31,17 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/categories/index.vue')
       },
       {
-      path: 'create',
-      name: 'categories.create',
-      meta,
-      component: () => import('@/views/categories/CategoryFormView.vue'),
-    },
-    {
-      path: ':id/edit',
-      name: 'categories.edit',
-      meta,
-      component: () => import('@/views/categories/CategoryFormView.vue'),
-    },
+        path: 'create',
+        name: 'categories.create',
+        meta,
+        component: () => import('@/views/categories/CategoryFormView.vue'),
+      },
+      {
+        path: ':id/edit',
+        name: 'categories.edit',
+        meta,
+        component: () => import('@/views/categories/CategoryFormView.vue'),
+      },
     ]
   },
   {
@@ -54,17 +54,17 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/products/ProductListView.vue')
       },
       {
-      path: 'create',
-      name: 'products.create',
-      meta,
-      component: () => import('@/views/products/ProductFormView.vue'),
-    },
-    {
-      path: ':id/edit',
-      name: 'products.edit',
-      meta,
-      component: () => import('@/views/products/ProductFormView.vue'),
-    },
+        path: 'create',
+        name: 'products.create',
+        meta,
+        component: () => import('@/views/products/ProductFormView.vue'),
+      },
+      {
+        path: ':id/edit',
+        name: 'products.edit',
+        meta,
+        component: () => import('@/views/products/ProductFormView.vue'),
+      },
     ]
   },
   {
@@ -89,6 +89,66 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/sales',
+    meta,
+    children: [
+      {
+        path: 'history',
+        name: 'sales.history',
+        component: () => import('@/views/sales/SalesHistoryView.vue'),
+      },
+    ],
+  },
+  {
+    path: '/cash-register',
+    meta,
+    children: [
+      {
+        path: '',
+        name: 'cash-register.shift',
+        component: () => import('@/views/cash-register/CashShiftView.vue'),
+      },
+      {
+        path: 'history',
+        name: 'cash-register.history',
+        component: () => import('@/views/cash-register/ShiftHistoryView.vue'),
+      },
+    ],
+  },
+  {
+    path: '/receivables',
+    meta,
+    children: [
+      {
+        path: '',
+        name: 'receivables.index',
+        component: () => import('@/views/receivables/ReceivablesView.vue'),
+      },
+    ],
+  },
+  {
+    path: '/pos',
+    name: 'pos.terminal',
+    component: () => import('@/views/pos/PosTerminalView.vue'),
+    meta
+  },
+  {
+  path: '/purchasing',
+  meta,
+  children: [
+    {
+      path: 'suppliers',
+      name: 'purchasing.suppliers',
+      component: () => import('@/views/purchasing/SuppliersView.vue'),
+    },
+    {
+      path: 'purchases',
+      name: 'purchasing.purchases',
+      component: () => import('@/views/purchasing/PurchasesView.vue'),
+    },
+  ],
+},
+  {
     path: '/settings',
     name: 'settings',
     meta,
@@ -97,7 +157,7 @@ const routes: RouteRecordRaw[] = [
 ];
 
 const router = createRouter({
-  history: createWebHistory('/vue'),
+  history: createWebHistory(),
   routes,
 });
 

@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\Product;
-use App\Models\Purchase;
-use App\Models\PurchaseItem;
+use App\Modules\Catalog\Domain\Models\Product;
+use App\Modules\Purchasing\Domain\Models\Purchase;
+use App\Modules\Purchasing\Domain\Models\PurchaseItem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

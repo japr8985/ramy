@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\Unit;
+use App\Modules\Catalog\Domain\Models\Category;
+use App\Modules\Catalog\Domain\Models\Product;
+use App\Modules\Catalog\Domain\Models\Unit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
