@@ -15,12 +15,7 @@ const uiStore = useUiStore();
   <app-toolbar />
 
   <!-- Área de Trabajo -->
-  
-    <v-container>
-      <slot />
-    </v-container>
-  
-  
+  <slot />
   <!-- Barra Inferior -->
   <AppBottomNav v-if="uiStore.isHandheld && uiStore.showBottomNav" />
 </template>

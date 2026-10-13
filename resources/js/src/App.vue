@@ -1,10 +1,12 @@
 <template>
   <v-app>
-    <v-main>
       <component :is="layout">
-        <router-view />
+        <v-main>
+          <v-container fluid class="fill-height align-start">
+            <router-view />
+          </v-container>
+        </v-main>
       </component>
-    </v-main>
     <app-notification />
   </v-app>
 </template>
