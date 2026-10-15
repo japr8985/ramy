@@ -153,6 +153,12 @@ const routes: RouteRecordRaw[] = [
     name: 'settings',
     meta,
     component: () => import('@/views/Settings.vue')
+  },
+  {
+    path: '/units',
+    name: 'units',
+    meta,
+    component: () => import('@/views/units/index.vue')
   }
 ];
 

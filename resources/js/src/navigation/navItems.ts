@@ -52,6 +52,7 @@ export const navigationSections: NavSection[] = [
     header: 'Control & Sistema',
     items: [
       { title: 'Historial de Turnos', icon: 'mdi-history', to: '/cash-register/history' },
+      { title: 'Unidades', icon: 'mdi-weight', to: '/units'},
       { title: 'Configuración', icon: 'mdi-cog-outline', to: '/settings' },
     ],
   },
