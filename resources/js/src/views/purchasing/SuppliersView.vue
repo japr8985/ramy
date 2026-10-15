@@ -21,7 +21,7 @@
     </div>
 
     <!-- Tarjetas de Resumen / KPIs -->
-    <v-row dense class="mb-4">
+    <v-row class="mb-4">
       <v-col cols="12" sm="6">
         <v-card elevation="0" border rounded="lg" class="pa-4">
           <div class="d-flex justify-space-between align-center mb-1">
@@ -199,7 +199,7 @@
 
         <v-card-text class="pa-4">
           <v-form ref="formRef" @submit.prevent="submitForm">
-            <v-row dense>
+            <v-row>
               <v-col cols="12" sm="7">
                 <v-text-field
                   v-model="form.name"

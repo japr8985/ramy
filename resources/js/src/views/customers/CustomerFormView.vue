@@ -60,7 +60,7 @@
               Datos requeridos para comprobantes de pago y facturación.
             </span>
 
-            <v-row dense>
+            <v-row>
               <v-col cols="12" sm="5">
                 <v-text-field
                   v-model="form.rif_ci"
@@ -109,7 +109,7 @@
               Canales de comunicación directa y dirección de despacho/fiscal.
             </span>
 
-            <v-row dense>
+            <v-row>
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="form.phone"

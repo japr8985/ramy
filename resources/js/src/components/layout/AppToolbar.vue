@@ -11,6 +11,8 @@
     </v-app-bar-title>
 
     <v-spacer />
+    <easter-egg />
+    <v-spacer />
 
     <!-- 3. Indicador de Tasa: ultra compacto en móvil -->
     <v-chip
@@ -61,25 +63,33 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { useUiStore } from '@/stores/ui';
+import { settingStore } from '@/stores/settings';
+import { storeToRefs } from 'pinia';
+import EasterEgg from './EasterEgg.vue';
 
 const { mobile } = useDisplay();
 const uiStore = useUiStore();
 const route = useRoute();
-
+const settingsStore = settingStore();
+const { settings } = storeToRefs(settingsStore);
 // Título reactivo según la ruta activa
 const currentRouteTitle = computed(() => {
   return (route.meta?.title as string) || 'POS';
 });
 
 // Datos de sesión y tasa (reemplazar con stores respectivos)
-const exchangeRate = 1.0;
+const exchangeRate = computed(() => {
+  return settings.value.exchange_rate;
+});
 const userName = 'Jorge';
 const userInitials = 'J';
-
+onMounted(async () => {
+  await settingsStore.get()
+});
 function handleLogout() {
   // Lógica de logout
 }

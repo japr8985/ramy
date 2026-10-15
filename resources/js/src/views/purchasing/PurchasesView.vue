@@ -160,7 +160,7 @@
         <v-card-text class="pa-4">
           <v-form ref="formRef" @submit.prevent="submitPurchase">
             <!-- Datos Generales de la Compra -->
-            <v-row dense class="mb-2">
+            <v-row class="mb-2">
               <v-col cols="12" sm="5">
                 <v-autocomplete
                   v-model="form.supplier_id"
@@ -239,7 +239,7 @@
                 <template #item="{ props, item: prodItem }">
                   <v-list-item
                     v-bind="props"
-                    :subtitle="`SKU: ${prodItem.raw.sku || 'N/A'} | Stock Actual: ${prodItem.raw.quantity} | Costo Anterior: $${Number(prodItem.raw.cost_price || 0).toFixed(2)}`"
+                    :subtitle="`SKU: ${prodItem.sku || 'N/A'} | Stock Actual: ${prodItem.quantity} | Costo Anterior: $${Number(prodItem.cost_price || 0).toFixed(2)}`"
                   />
                 </template>
               </v-autocomplete>
@@ -609,7 +609,7 @@ async function loadSuppliersList() {
   try {
     suppliersList.value = await purchasingService.getAllSuppliers();
   } catch {
-    notificationStore.show('Error al precargar proveedores.', 'warning');
+    notificationStore.warning('Error al precargar proveedores.');
   } finally {
     isLoadingSuppliers.value = false;
   }
@@ -622,7 +622,7 @@ async function loadCatalogProducts() {
     const response = await catalogService.getProducts({ per_page: 250 });
     catalogProducts.value = response.data;
   } catch {
-    notificationStore.show('Error al precargar productos.', 'warning');
+    notificationStore.warning('Error al precargar productos.');
   } finally {
     isLoadingCatalog.value = false;
   }
@@ -662,7 +662,7 @@ async function submitPurchase() {
   if (!valid) return;
 
   if (cartItems.value.length === 0) {
-    notificationStore.show('Debe agregar al menos un producto a la compra.', 'error');
+    notificationStore.error('Debe agregar al menos un producto a la compra.');
     return;
   }
 
@@ -683,11 +683,11 @@ async function submitPurchase() {
     };
 
     await purchasingService.receivePurchase(payload);
-    notificationStore.show('¡Compra registrada e inventario actualizado exitosamente!', 'success');
+    notificationStore.success('¡Compra registrada e inventario actualizado exitosamente!');
     createDialog.value = false;
     await loadPurchases();
   } catch (error: any) {
-    notificationStore.show(error?.response?.data?.message || 'Error al recepcionar la compra.', 'error');
+    notificationStore.error(error?.response?.data?.message || 'Error al recepcionar la compra.');
   } finally {
     isSubmitting.value = false;
   }
@@ -703,7 +703,7 @@ async function openDetails(purchase: Purchase) {
     try {
       selectedPurchase.value = await purchasingService.getPurchaseById(purchase.id);
     } catch {
-      notificationStore.show('Error al consultar renglones de la compra.', 'warning');
+      notificationStore.warning('Error al consultar renglones de la compra.');
     } finally {
       isLoadingDetails.value = false;
     }

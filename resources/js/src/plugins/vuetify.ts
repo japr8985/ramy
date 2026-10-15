@@ -78,4 +78,7 @@ export default createVuetify({
       mereyLight,
     },
   },
+  defaults: {
+    VRow: { density: 'compact'}
+  }
 });

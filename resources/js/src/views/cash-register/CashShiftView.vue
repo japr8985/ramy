@@ -50,7 +50,7 @@
       </div>
 
       <v-form ref="openFormRef" @submit.prevent="submitOpenShift">
-        <v-row dense>
+        <v-row>
           <v-col cols="12" sm="6">
             <v-text-field
               v-model.number="openForm.initial_cash_usd"
@@ -140,7 +140,7 @@
       </v-card>
 
       <!-- Métricas Consolidadas del Arqueo Bimoneda -->
-      <v-row dense>
+      <v-row>
         <!-- Tarjeta USD ($) -->
         <v-col cols="12" md="6">
           <v-card elevation="0" border rounded="lg" class="pa-4 h-100">
@@ -296,7 +296,7 @@
 
         <v-card-text class="pa-4">
           <v-form ref="movementFormRef" @submit.prevent="submitMovement">
-            <v-row dense>
+            <v-row>
               <v-col cols="6">
                 <v-select
                   v-model="movementForm.type"

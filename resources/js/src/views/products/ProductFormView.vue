@@ -65,7 +65,7 @@
             <h2 class="text-subtitle-1 font-weight-bold mb-1">Identificación y Clasificación</h2>
             <span class="text-caption text-medium-emphasis d-block mb-4">Código único, denominación comercial y categorización.</span>
 
-            <v-row dense>
+            <v-row>
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model="form.sku"
@@ -170,7 +170,7 @@
             <h2 class="text-subtitle-1 font-weight-bold mb-1">Control de Inventario</h2>
             <span class="text-caption text-medium-emphasis d-block mb-4">Parámetros de existencias y umbrales de reabastecimiento.</span>
 
-            <v-row dense>
+            <v-row>
               <v-col cols="12" sm="6">
                 <v-text-field
                   v-model.number="form.quantity"
@@ -415,10 +415,7 @@ async function loadInitialData() {
       }
     }
   } catch (error: any) {
-    notificationStore.show(
-      error?.response?.data?.message || 'Error al cargar los datos maestros del formulario.',
-      'error'
-    );
+    notificationStore.error(error?.response?.data?.message || 'Error al cargar los datos maestros del formulario.');
     router.push({ name: 'products.index' });
   } finally {
     isLoading.value = false;
@@ -436,21 +433,21 @@ async function resolveBarcode() {
     const result = await catalogService.lookupBarcode(form.sku);
 
     if (result.source === 'local' && result.data) {
-      notificationStore.show('Código existente en el inventario local.', 'info');
+      notificationStore.info('Código existente en el inventario local.');
       form.name = result.data.name;
       if (result.data.category_id) form.category_id = result.data.category_id;
       if (result.data.unit_id) form.unit_id = result.data.unit_id;
       if (result.data.selling_price) form.selling_price = Number(result.data.selling_price);
       if (result.data.description) form.description = result.data.description;
     } else if (result.source === 'external' && result.data) {
-      notificationStore.show('¡Producto encontrado en catálogo global!', 'success');
+      notificationStore.success('¡Producto encontrado en catálogo global!');
       form.name = result.data.name;
       form.description = result.data.description || '';
     } else {
-      notificationStore.show('No se encontraron registros previos para este código.', 'info');
+      notificationStore.info('No se encontraron registros previos para este código.');
     }
   } catch {
-    notificationStore.show('No se pudo verificar el código de barras en línea.', 'warning');
+    notificationStore.warning('No se pudo verificar el código de barras en línea.');
   } finally {
     isLookingUpBarcode.value = false;
   }
@@ -464,7 +461,7 @@ async function submit() {
 
   const { valid } = await formRef.value.validate();
   if (!valid) {
-    notificationStore.show('Por favor revise los campos con error.', 'warning');
+    notificationStore.warning('Por favor revise los campos con error.');
     return;
   }
 
@@ -486,18 +483,15 @@ async function submit() {
 
     if (isEditing.value && productId.value) {
       await catalogService.updateProduct(productId.value, payload);
-      notificationStore.show('Producto actualizado exitosamente.', 'success');
+      notificationStore.success('Producto actualizado exitosamente.');
     } else {
       await catalogService.createProduct(payload);
-      notificationStore.show('Producto registrado en el inventario con éxito.', 'success');
+      notificationStore.success('Producto registrado en el inventario con éxito.');
     }
 
     router.push({ name: 'products.index' });
   } catch (error: any) {
-    notificationStore.show(
-      error?.response?.data?.message || 'Error al persistir el producto.',
-      'error'
-    );
+    notificationStore.error(error?.response?.data?.message || 'Error al persistir el producto.');
   } finally {
     isSaving.value = false;
   }

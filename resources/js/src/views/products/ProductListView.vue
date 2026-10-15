@@ -87,10 +87,9 @@
     </v-row>
 
     <!-- Contenedor Principal: Filtros y Tabla -->
-    <v-card elevation="0" border rounded="lg">
-      <div class="pa-4 d-flex flex-column flex-md-row justify-space-between align-center gap-3">
-        <!-- Barra de Búsqueda y Selector de Categoría -->
-        <div class="d-flex flex-column flex-sm-row align-center gap-3 w-100" style="max-width: 640px;">
+    <v-card elevation="0" rounded="lg">
+      <v-row class="pa-2">
+        <v-col cols="12" md="4" xs="12">
           <v-text-field
             v-model="searchQuery"
             placeholder="Buscar por nombre o código SKU..."
@@ -103,7 +102,8 @@
             @update:model-value="onSearchInput"
             @click:clear="onSearchClear"
           />
-
+        </v-col>
+        <v-col cols="12" md="4" xs="12">
           <v-select
             v-model="selectedCategory"
             :items="categories"
@@ -114,22 +114,10 @@
             density="compact"
             hide-details
             clearable
-            class="w-100"
-            style="max-width: 260px;"
             @update:model-value="onCategoryChange"
           />
-        </div>
-
-        <!-- Botón de Recargar -->
-        <v-btn
-          variant="text"
-          density="compact"
-          icon="mdi-refresh"
-          :loading="isLoading"
-          title="Recargar catálogo"
-          @click="refreshData"
-        />
-      </div>
+        </v-col>
+      </v-row>
 
       <v-divider />
 

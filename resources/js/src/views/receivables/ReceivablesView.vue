@@ -16,7 +16,7 @@
     </div>
 
     <!-- Tarjetas de Métricas / KPIs -->
-    <v-row dense class="mb-4">
+    <v-row class="mb-4">
       <v-col cols="12" sm="4">
         <v-card elevation="0" border rounded="lg" class="pa-4">
           <div class="d-flex justify-space-between align-center mb-1">
@@ -242,7 +242,7 @@
           </div>
 
           <v-form ref="paymentFormRef" @submit.prevent="submitPayment">
-            <v-row dense>
+            <v-row>
               <!-- Selector de moneda de entrada para conveniencia del cajero -->
               <v-col cols="12" class="mb-2">
                 <v-btn-toggle v-model="inputCurrency" mandatory color="primary" density="compact" class="w-100">
@@ -367,7 +367,7 @@
           <v-divider class="my-3" />
 
           <!-- Resumen de Saldos -->
-          <v-row dense class="mb-3">
+          <v-row class="mb-3">
             <v-col cols="4">
               <v-card elevation="0" border rounded="lg" class="pa-2 text-center bg-surface-light">
                 <span class="text-caption text-medium-emphasis d-block">Total</span>

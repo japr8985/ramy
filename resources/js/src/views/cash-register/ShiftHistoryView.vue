@@ -189,7 +189,7 @@
             Conciliación de Cierre
           </span>
 
-          <v-row dense class="mb-3">
+          <v-row class="mb-3">
             <!-- USD -->
             <v-col cols="6">
               <v-card elevation="0" border rounded="lg" class="pa-3 bg-surface-light h-100">
