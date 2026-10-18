@@ -44,7 +44,7 @@
       </div>
     </div>
 
-    <!-- Skeleton durante carga inicial de dependencias/edición -->
+    <!-- Skeleton durante carga inicial -->
     <v-row v-if="isLoading">
       <v-col cols="12" md="8">
         <v-skeleton-loader type="article, actions" class="border rounded-lg mb-4" />
@@ -66,8 +66,10 @@
             <span class="text-caption text-medium-emphasis d-block mb-4">Código único, denominación comercial y categorización.</span>
 
             <v-row>
-              <v-col cols="12" sm="6">
+              <!-- Campo Código de Barras / SKU con Escáner y Consulta -->
+              <v-col cols="12" sm="7">
                 <v-text-field
+                  ref="skuInputRef"
                   v-model="form.sku"
                   label="Código de Barras / SKU *"
                   placeholder="Escanee o ingrese código..."
@@ -76,23 +78,38 @@
                   prepend-inner-icon="mdi-barcode-scan"
                   :rules="[rules.required, rules.maxLength(50)]"
                   class="mb-2"
+                  @click:prepend-inner="isScannerOpen = true"
+                  @keydown.enter.stop.prevent="resolveBarcode"
                 >
                   <template #append-inner>
-                    <v-btn
-                      v-if="!isEditing && form.sku"
-                      icon="mdi-cloud-search-outline"
-                      size="x-small"
-                      variant="text"
-                      color="primary"
-                      :loading="isLookingUpBarcode"
-                      title="Consultar en base de datos e internet"
-                      @click="resolveBarcode"
-                    />
+                    <div class="d-flex align-center gap-1">
+                      <!-- Botón para activar cámara -->
+                      <v-btn
+                        icon="mdi-camera-outline"
+                        size="x-small"
+                        variant="text"
+                        color="primary"
+                        title="Escanear con la cámara del dispositivo"
+                        @click="isScannerOpen = true"
+                      />
+
+                      <!-- Botón de consulta manual/online -->
+                      <v-btn
+                        v-if="form.sku"
+                        icon="mdi-cloud-search-outline"
+                        size="x-small"
+                        variant="text"
+                        color="primary"
+                        :loading="isLookingUpBarcode"
+                        title="Consultar en base de datos e internet"
+                        @click="resolveBarcode"
+                      />
+                    </div>
                   </template>
                 </v-text-field>
               </v-col>
 
-              <v-col cols="12" sm="6">
+              <v-col cols="12" sm="5">
                 <v-switch
                   v-model="form.is_active"
                   color="success"
@@ -244,7 +261,7 @@
               :rules="[rules.required, rules.positiveDecimal]"
               class="mb-1"
             />
-            <div class="text-caption text-medium-emphasis mb-4 text-right">
+            <div class="text-caption text-medium-emphasis mb-4 text-right font-mono">
               Equivalente: <strong>Bs. {{ costPriceVes }}</strong>
             </div>
 
@@ -262,7 +279,7 @@
               :rules="[rules.required, rules.positiveDecimal]"
               class="mb-1"
             />
-            <div class="text-caption text-medium-emphasis mb-4 text-right">
+            <div class="text-caption text-medium-emphasis mb-4 text-right font-mono">
               Equivalente: <strong>Bs. {{ sellingPriceVes }}</strong>
             </div>
 
@@ -271,7 +288,7 @@
             <!-- Indicadores de Rentabilidad en Tiempo Real -->
             <div class="d-flex justify-space-between align-center mb-1">
               <span class="text-caption text-medium-emphasis">Margen Bruto Unitario:</span>
-              <span class="text-caption font-weight-bold" :class="profitMargin >= 0 ? 'text-success' : 'text-error'">
+              <span class="text-caption font-weight-bold font-mono" :class="profitMargin >= 0 ? 'text-success' : 'text-error'">
                 ${{ unitProfit.toFixed(2) }} ({{ profitMargin.toFixed(1) }}%)
               </span>
             </div>
@@ -290,6 +307,12 @@
         </v-col>
       </v-row>
     </v-form>
+
+    <!-- Modal de Escáner por Cámara -->
+    <PosBarcodeScannerDialog
+      v-model="isScannerOpen"
+      @detected="handleBarcodeDetected"
+    />
   </div>
 </template>
 
@@ -300,6 +323,7 @@ import catalogService from '@/api/catalog.api';
 import settingsService from '@/api/settings.api';
 import { useNotificationStore } from '@/stores/notification';
 import type { Category, Unit, CreateProductPayload } from '@/types/catalog';
+import PosBarcodeScannerDialog from '@/views/pos/components/PosBarcodeScannerDialog.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -311,7 +335,10 @@ const isEditing = computed(() => !!productId.value);
 const isLoading = ref(true);
 const isSaving = ref(false);
 const isLookingUpBarcode = ref(false);
+const isScannerOpen = ref(false);
+
 const formRef = ref<HTMLFormElement | null>(null);
+const skuInputRef = ref<any>(null);
 
 // Datos relacionales y de configuración
 const categories = ref<Category[]>([]);
@@ -373,7 +400,7 @@ const profitMargin = computed(() => {
 });
 
 /**
- * Carga inicial de datos maestros (tasa, categorías, unidades) y del producto si es edición
+ * Carga inicial de datos maestros y producto
  */
 async function loadInitialData() {
   isLoading.value = true;
@@ -387,11 +414,9 @@ async function loadInitialData() {
     categories.value = fetchedCategories;
     units.value = fetchedUnits;
 
-    // Asignación de tasa oficial
     const rate = Number(fetchedSettings['exchange_rate'] || fetchedSettings['bcv_rate'] || 1.0);
     exchangeRate.value = rate > 0 ? rate : 1.0;
 
-    // Si es edición, cargamos el producto
     if (isEditing.value && productId.value) {
       const product = await catalogService.getProductById(productId.value);
       form.sku = product.sku;
@@ -406,7 +431,6 @@ async function loadInitialData() {
       form.description = product.description || '';
       form.notes = product.notes || '';
     } else {
-      // Fallback predeterminado en creación si existen registros
       if (categories.value.length > 0 && !form.category_id) {
         form.category_id = categories.value[0].id;
       }
@@ -415,7 +439,7 @@ async function loadInitialData() {
       }
     }
   } catch (error: any) {
-    notificationStore.error(error?.response?.data?.message || 'Error al cargar los datos maestros del formulario.');
+    notificationStore.error(error?.response?.data?.message || 'Error al cargar los datos del formulario.');
     router.push({ name: 'products.index' });
   } finally {
     isLoading.value = false;
@@ -423,28 +447,49 @@ async function loadInitialData() {
 }
 
 /**
- * Búsqueda de código de barras asistida (local + internet)
+ * Handler invocado al detectar código desde la cámara
+ */
+async function handleBarcodeDetected(scannedCode: string) {
+  const cleanCode = scannedCode.trim();
+  if (!cleanCode) return;
+
+  form.sku = cleanCode;
+  await resolveBarcode();
+}
+
+/**
+ * Consulta de código de barras asistida (local + internet)
  */
 async function resolveBarcode() {
-  if (!form.sku || isLookingUpBarcode.value) return;
+  const code = form.sku ? form.sku.trim() : '';
+  if (!code || isLookingUpBarcode.value) return;
 
   isLookingUpBarcode.value = true;
   try {
-    const result = await catalogService.lookupBarcode(form.sku);
+    const result = await catalogService.lookupBarcode(code);
 
-    if (result.source === 'local' && result.data) {
-      notificationStore.info('Código existente en el inventario local.');
+    const isLocal = result.source === 'local' || (result as any).exists_locally;
+
+    if (isLocal && result.data) {
+      if (!isEditing.value) {
+        notificationStore.info(`El código ya existe en inventario local: "${result.data.name}".`);
+      } else {
+        notificationStore.info('Datos vinculados a inventario local.');
+      }
       form.name = result.data.name;
       if (result.data.category_id) form.category_id = result.data.category_id;
       if (result.data.unit_id) form.unit_id = result.data.unit_id;
+      if (result.data.purchase_price) form.purchase_price = Number(result.data.purchase_price);
       if (result.data.selling_price) form.selling_price = Number(result.data.selling_price);
       if (result.data.description) form.description = result.data.description;
     } else if (result.source === 'external' && result.data) {
-      notificationStore.success('¡Producto encontrado en catálogo global!');
+      notificationStore.success('¡Producto localizado en catálogo global!');
       form.name = result.data.name;
-      form.description = result.data.description || '';
+      if (result.data.description) {
+        form.description = result.data.description;
+      }
     } else {
-      notificationStore.info('No se encontraron registros previos para este código.');
+      notificationStore.info('Código no registrado previamente. Complete los datos.');
     }
   } catch {
     notificationStore.warning('No se pudo verificar el código de barras en línea.');
@@ -468,8 +513,8 @@ async function submit() {
   isSaving.value = true;
   try {
     const payload: CreateProductPayload = {
-      sku: form.sku,
-      name: form.name,
+      sku: form.sku.trim(),
+      name: form.name.trim(),
       category_id: form.category_id,
       unit_id: form.unit_id,
       purchase_price: Number(form.purchase_price),
@@ -503,7 +548,16 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.gap-2 { gap: 8px; }
-.gap-3 { gap: 12px; }
-.font-mono { font-family: monospace; }
+.font-mono {
+  font-family: monospace;
+}
+.gap-1 {
+  gap: 4px;
+}
+.gap-2 {
+  gap: 8px;
+}
+.gap-3 {
+  gap: 12px;
+}
 </style>

@@ -6,10 +6,14 @@
     <div class="pos-level-1 px-3 pt-2 pb-1 border-b bg-surface flex-shrink-0">
       <!-- Buscador y Chip de Cliente -->
       <div class="d-flex align-center gap-2 mb-2">
+        <PosBarcodeScannerDialog
+      v-model="isCameraScannerOpen"
+      @detected="onBarcodeDetected"
+    />
         <v-text-field
           ref="barcodeInputRef"
           v-model="searchQuery"
-          placeholder="Buscar o escanear..."
+          placeholder="Buscar o SKU..."
           prepend-inner-icon="mdi-magnify"
           append-inner-icon="mdi-barcode-scan"
           variant="outlined"
@@ -18,6 +22,7 @@
           clearable
           class="flex-grow-1"
           @keydown.enter.prevent="onBarcodeScanEnter"
+          @click:append-inner="isCameraScannerOpen = true"
           @update:model-value="onSearchInput"
           @click:clear="onSearchClear"
         />
@@ -99,6 +104,7 @@ import PosCategoryChips from './components/PosCategoryChips.vue';
 import PosProductVirtualList from './components/PosProductVirtualList.vue';
 import PosMobileDock from './components/PosMobileDock.vue';
 import PosCartDrawer from './components/PosCartDrawer.vue';
+import PosBarcodeScannerDialog from './components/PosBarcodeScannerDialog.vue';
 
 const posStore = usePosStore();
 const notificationStore = useNotificationStore();
@@ -122,6 +128,48 @@ const currentCustomerLabel = computed(() => {
   return c ? c.name : 'Cliente';
 });
 
+const isCameraScannerOpen = ref(false);
+
+// Función unificada cuando la cámara o el teclado detectan un código
+async function processScannedCode(code: string) {
+  const cleanCode = code.trim();
+  if (!cleanCode) return;
+
+  // 1. Buscar en memoria local primero
+  const foundLocal = products.value.find(
+    (p) => p.sku.toLowerCase() === cleanCode.toLowerCase()
+  );
+
+  if (foundLocal) {
+    posStore.addToCart(foundLocal);
+    notificationStore.success(`Agregado: ${foundLocal.name}`);
+    searchQuery.value = '';
+    return;
+  }
+
+  // 2. Si no está en memoria, consultar backend
+  try {
+    const result = await catalogService.lookupBarcode(cleanCode);
+    if (result.exists_locally && result.data?.id) {
+      const fullProduct = await catalogService.getProductById(result.data.id);
+      posStore.addToCart(fullProduct);
+      notificationStore.success(`Agregado: ${fullProduct.name}`);
+      searchQuery.value = '';
+    } else {
+      notificationStore.warning(`Código ${cleanCode} no registrado.`);
+    }
+  } catch {
+    notificationStore.warning('Error al procesar el código de barras.');
+  }
+}
+
+function onBarcodeScanEnter() {
+  processScannedCode(searchQuery.value);
+}
+
+function onBarcodeDetected(scannedCode: string) {
+  processScannedCode(scannedCode);
+}
 async function loadInitialData() {
   try {
     const [fetchedCategories, fetchedCustomers, fetchedSettings] = await Promise.all([
@@ -177,30 +225,30 @@ function onSearchClear() {
   loadProducts();
 }
 
-async function onBarcodeScanEnter() {
-  const code = searchQuery.value.trim();
-  if (!code) return;
+// async function onBarcodeScanEnter() {
+//   const code = searchQuery.value.trim();
+//   if (!code) return;
 
-  const foundLocal = products.value.find(p => p.sku.toLowerCase() === code.toLowerCase());
-  if (foundLocal) {
-    posStore.addToCart(foundLocal);
-    searchQuery.value = '';
-    return;
-  }
+//   const foundLocal = products.value.find(p => p.sku.toLowerCase() === code.toLowerCase());
+//   if (foundLocal) {
+//     posStore.addToCart(foundLocal);
+//     searchQuery.value = '';
+//     return;
+//   }
 
-  try {
-    const result = await catalogService.lookupBarcode(code);
-    if (result.exists_locally && result.data?.id) {
-      const fullProduct = await catalogService.getProductById(result.data.id);
-      posStore.addToCart(fullProduct);
-      searchQuery.value = '';
-    } else {
-      notificationStore.warning(`Código ${code} no encontrado.`);
-    }
-  } catch {
-    notificationStore.warning('Error al escanear código.');
-  }
-}
+//   try {
+//     const result = await catalogService.lookupBarcode(code);
+//     if (result.exists_locally && result.data?.id) {
+//       const fullProduct = await catalogService.getProductById(result.data.id);
+//       posStore.addToCart(fullProduct);
+//       searchQuery.value = '';
+//     } else {
+//       notificationStore.warning(`Código ${code} no encontrado.`);
+//     }
+//   } catch {
+//     notificationStore.warning('Error al escanear código.');
+//   }
+// }
 
 function onSaleCompleted() {
   loadProducts();

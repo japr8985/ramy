@@ -6,6 +6,13 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 
 export default defineConfig({
+    server: { 
+        host: '0.0.0.0', // Escuchar en todas las interfaces de red
+        hmr: {
+            host: '192.168.0.103', // <-- REEMPLAZA con la IP local de tu PC
+        },
+        cors: true,
+    },
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.ts'],
