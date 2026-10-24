@@ -4,15 +4,7 @@ import vue from '@vitejs/plugin-vue';
 import vuetify from 'vite-plugin-vuetify';
 import { VitePWA } from 'vite-plugin-pwa';
 
-
 export default defineConfig({
-    server: { 
-        host: '0.0.0.0', // Escuchar en todas las interfaces de red
-        hmr: {
-            host: '192.168.0.103', // <-- REEMPLAZA con la IP local de tu PC
-        },
-        cors: true,
-    },
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.ts'],
@@ -22,33 +14,35 @@ export default defineConfig({
         vuetify({ autoImport: true }),
         VitePWA({
             registerType: 'autoUpdate',
-            outDir: 'public',
-            buildBase: '/',
+            injectRegister: 'auto',
+            outDir: 'public', // Fuerza la salida de sw.js a la raíz de public/
             scope: '/',
+            base: '/',
             devOptions: {
-                enable: true
+                enabled: false,
             },
+            filename: 'sw.js',
             manifest: {
-                name: 'Mi Aplicación Laravel',
-                short_name: 'MiApp',
-                description: 'Aplicación construida con Laravel, Vue 3 y Vuetify',
-                theme_color: '#1867c0', // Color primario de tu interfaz
-                background_color: '#ffffff',
+                name: 'Ramy Store',
+                short_name: 'RamyStore',
+                description: 'App de Ramy',
+                theme_color: '#0A0C13',
+                background_color: '#0A0C13',
                 display: 'standalone',
                 start_url: '/',
                 icons: [
                     {
-                        src: '/icons/icon-192x192.png',
+                        src: '/favicon/icon-192x192.png',
                         sizes: '192x192',
                         type: 'image/png',
                     },
                     {
-                        src: '/icons/icon-512x512.png',
+                        src: '/favicon/icon-512x512.png',
                         sizes: '512x512',
                         type: 'image/png',
                     },
                     {
-                        src: '/icons/icon-512x512.png',
+                        src: '/favicon/maskable-icon-512x512.png',
                         sizes: '512x512',
                         type: 'image/png',
                         purpose: 'any maskable',
@@ -56,9 +50,9 @@ export default defineConfig({
                 ],
             },
             workbox: {
-                // Archivos que el Service Worker guardará en caché
-                globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-                navigateFallback: '/',
+                globPatterns: ['**/*.{js,css,ico,png,svg,woff2,ttf,eot}'],
+                globIgnores: ['**/manifest.webmanifest', '**/site.webmanifest'],
+                navigateFallback: null,
             },
         }),
     ],

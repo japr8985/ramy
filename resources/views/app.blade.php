@@ -6,11 +6,9 @@
     <title>{{ config('app.name') }}</title>
 
     <!-- Metadatos de la PWA -->
-    <meta name="theme-color" content="#1867c0">
-    {{-- <link rel="manifest" href="/manifest.webmanifest"> --}}
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0A0C13">
+    <link rel="manifest" href="/build/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/favicon/icon-192x192.png">
 
     @vite(['resources/css/app.css', 'resources/js/app.ts'])
 </head>

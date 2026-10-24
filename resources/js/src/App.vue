@@ -8,6 +8,8 @@
         </v-main>
       </component>
     <app-notification />
+    <!-- Notificación de actualización (solo visible tras autenticarse en MainLayout) -->
+  <PwaUpdateSnackbar />
   </v-app>
 </template>
 
@@ -15,6 +17,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import AppNotification from './components/common/AppNotification.vue';
+import PwaUpdateSnackbar from './components/common/PwaUpdateSnackbar.vue';
 
 const route = useRoute();
 
