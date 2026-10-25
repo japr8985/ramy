@@ -12,7 +12,7 @@ interface ApiResponseContract<T = any> {
 
 const instance: AxiosInstance = axios.create({
   // baseURL: '/',
-  baseURL: `http://${window.location.hostname}:8000/`,
+  baseURL: `/`,
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
